@@ -14,18 +14,25 @@ missing_values:
 outliers:
   # OutlierDetector.handle_outliers(df, selected_columns)
   detection_method: "IQR"
-  # Columns referenced from EDA processed CSVs for numeric anomaly checks
+  # Columns from EDA/03_handling_outliers.ipynb - all numerical columns used for outlier detection
   selected_columns:
     - Views
     - Likes
     - Shares
     - Comments
+    - Like_Rate
+    - Share_Rate
+    - Comment_Rate
+    - Engagement_Rate
+    - Like_to_Comment_Ratio
+    - Share_to_Like_Ratio
+    - Views_Norm
   # Remove a row if it is an outlier in >= this many selected columns
   remove_if_outlier_count_ge: 2
 
 feature_engineering:
   # NewFeatureEngineer.__init__(means_file), fit(df), handle(df)
-  means_file: "Piepeline/artifacts/models/platform_means.json"
+  means_file: "platform_means.json"
   required_columns:
     - Platform
     - Views

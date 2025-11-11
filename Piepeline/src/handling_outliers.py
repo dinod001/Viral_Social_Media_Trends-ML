@@ -32,8 +32,8 @@ class IQROutlierDetection(OutlierDetectionStrategy):
             Q3 = df[col].quantile(0.75)
             IQR = Q3 - Q1
 
-            lower_bound = Q1 - 1.5 * IQR
-            upper_bound = Q3 + 1.5 * IQR
+            lower_bound = Q1 - 2 * IQR
+            upper_bound = Q3 + 2 * IQR
 
             outliers[col] = (df[col] < lower_bound) | (df[col] > upper_bound)
 
