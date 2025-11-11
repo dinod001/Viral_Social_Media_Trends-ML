@@ -1,0 +1,108 @@
+data:
+  raw_path: "data/raw/Viral_Social_Media_Trends.csv"
+  processed_dir: "data/processed"
+
+ingestion:
+  # DataIngestorCSV.ingest(file_path_or_link)
+  file_type: "csv"
+  source_path: "Piepeline/data/raw/Viral_Social_Media_Trends.csv"
+
+missing_values:
+  # DropMissingValuesStrategy.handle(df)
+  strategy: "drop_missing_and_duplicates"
+
+outliers:
+  # OutlierDetector.handle_outliers(df, selected_columns)
+  detection_method: "IQR"
+  # Columns referenced from EDA processed CSVs for numeric anomaly checks
+  selected_columns:
+    - Views
+    - Likes
+    - Shares
+    - Comments
+  # Remove a row if it is an outlier in >= this many selected columns
+  remove_if_outlier_count_ge: 2
+
+feature_engineering:
+  # NewFeatureEngineer.__init__(means_file), fit(df), handle(df)
+  means_file: "Piepeline/artifacts/models/platform_means.json"
+  required_columns:
+    - Platform
+    - Views
+    - Likes
+    - Shares
+    - Comments
+  # Engineered outputs used in EDA (case as seen in processed CSVs)
+  outputs:
+    - Like_Rate
+    - Share_Rate
+    - Comment_Rate
+    - engagement_rate
+    - like_to_comment_ratio
+    - share_to_like_ratio
+    - Views_norm
+    # Note: EDA uses lowercase 'engagement_rate'
+
+preprocessing:
+  regression:
+    # RegressionPreprocessor.__init__(...)
+    save_path: "Piepeline/data/processed"
+    artifacts_path: "Piepeline/artifacts/encode"
+    # Drop per EDA 05_encoding_and_scalling.ipynb
+    columns_to_drop:
+      - Share_Rate
+      - share_to_like_ratio
+      - engagement_rate
+    nominal_columns:
+      - Platform
+      - Hashtag
+      - Content_Type
+      - Region
+    numerical_columns:
+      - Views
+      - Likes
+      - Shares
+      - Comments
+      - Like_Rate
+      - Comment_Rate
+      - like_to_comment_ratio
+      - Views_norm
+    ordinal_columns: []
+
+  classification:
+    # ClassificationPreprocessor.__init__(...)
+    save_path: "Piepeline/data/processed"
+    artifacts_path: "Piepeline/artifacts/encode"
+    encoder_path: "Piepeline/artifacts/encode"
+    # From EDA/data/processed/df_cla.csv header
+    columns_to_keep:
+      - Platform
+      - Hashtag
+      - Content_Type
+      - Region
+      - Views
+      - Views_norm
+      - Engagement_Level
+    nominal_columns:
+      - Platform
+      - Hashtag
+      - Content_Type
+      - Region
+    numerical_columns:
+      - Views
+      - Views_norm
+
+splitting:
+  # SimpleTrainTestSplitStrategy.__init__(test_size, random_state, stratify)
+  # and split_data(df, target_column)
+  regression:
+    target_column: "Shares"
+    test_size: 0.2
+    random_state: 42
+    stratify: false
+  classification:
+    target_column: "Engagement_Level"
+    test_size: 0.2
+    random_state: 42
+    stratify: true
+
