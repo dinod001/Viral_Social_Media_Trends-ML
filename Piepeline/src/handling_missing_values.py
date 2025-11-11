@@ -1,22 +1,38 @@
 import pandas as pd
 import logging
-from abc import ABC,abstractmethod
-logging.basicConfig(level=logging.INFO, format=
-    '%(asctime)s - %(levelname)s - %(message)s')
+from abc import ABC, abstractmethod
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 class MissingValueHandlingStrategy(ABC):
+    """Abstract base class for missing value handling strategies."""
+
     @abstractmethod
-    def handle(self, df:pd.DataFrame)->pd.DataFrame:
+    def handle(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Handle missing values in the provided DataFrame."""
         pass
 
+
 class DropMissingValuesStrategy(MissingValueHandlingStrategy):
-    
-    def handle(self, df:pd.DataFrame)->pd.DataFrame:
-        #dropiing any null values
+    """Concrete strategy that drops rows with missing or duplicate values."""
+
+    def handle(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Drop rows containing any nulls or duplicates."""
+
+        original_len = len(df)
+
+        # Drop rows with any null values
         df_cleaned = df.dropna()
 
         # Drop duplicate rows
         df_cleaned = df_cleaned.drop_duplicates()
-        n_dropped = len(df) - len(df_cleaned)
-        logging.info(f"{n_dropped} has been dropped")
+
+        # Log how many rows were dropped
+        n_dropped = original_len - len(df_cleaned)
+        logging.info(f"{n_dropped} rows dropped (missing or duplicate values).")
+
         return df_cleaned
