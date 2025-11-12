@@ -44,22 +44,22 @@ feature_engineering:
     - Like_Rate
     - Share_Rate
     - Comment_Rate
-    - engagement_rate
-    - like_to_comment_ratio
-    - share_to_like_ratio
-    - Views_norm
+    - Engagement_Rate
+    - Like_to_Comment_Ratio
+    - Share_to_Like_Ratio
+    - Views_Norm
     # Note: EDA uses lowercase 'engagement_rate'
 
 preprocessing:
   regression:
     # RegressionPreprocessor.__init__(...)
-    save_path: "Piepeline/data/processed"
-    artifacts_path: "Piepeline/artifacts/encode"
+    save_path: "data/processed"
+    artifacts_path: "artifacts/preprocessor/"
     # Drop per EDA 05_encoding_and_scalling.ipynb
     columns_to_drop:
       - Share_Rate
-      - share_to_like_ratio
-      - engagement_rate
+      - Share_to_Like_Ratio
+      - Engagement_Rate
     nominal_columns:
       - Platform
       - Hashtag
@@ -72,9 +72,10 @@ preprocessing:
       - Comments
       - Like_Rate
       - Comment_Rate
-      - like_to_comment_ratio
-      - Views_norm
-    ordinal_columns: []
+      - Like_to_Comment_Ratio
+      - Views_Norm
+    ordinal_columns: 
+      - Engagement_Level
 
   classification:
     # ClassificationPreprocessor.__init__(...)
@@ -88,7 +89,7 @@ preprocessing:
       - Content_Type
       - Region
       - Views
-      - Views_norm
+      - Views_Norm
       - Engagement_Level
     nominal_columns:
       - Platform
@@ -97,7 +98,7 @@ preprocessing:
       - Region
     numerical_columns:
       - Views
-      - Views_norm
+      - Views_Norm
 
 splitting:
   # SimpleTrainTestSplitStrategy.__init__(test_size, random_state, stratify)

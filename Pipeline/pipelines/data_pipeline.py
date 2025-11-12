@@ -33,7 +33,8 @@ def data_pipeline(
     missing_config = get_missing_values()
     outlier_config = get_outliers()
     feature_engineering_config = get_feature_engineering()
-    #preprocessing_config = get_preprocessing()
+    reg_config = get_preprocessing(task="regression")
+    cla_config = get_preprocessing(task="classification")
     #splitting_config = get_splitting()
 
     print("\n----------01 data ingestion-----------\n")
@@ -57,6 +58,22 @@ def data_pipeline(
     outlier_handler = OutlierDetector(IQROutlierDetection())
     df = outlier_handler.handle_outliers(df,selected_columns=outlier_config["selected_columns"])
     print(df.shape[0])
+
+    print("\n------------step 04: Scalling and encoding--------------\n")
+
+    reg_handler = RegressionPreprocessor(columns_to_drop=reg_config["columns_to_drop"],
+                                         nominal_columns_reg= reg_config["nominal_columns"],
+                                         numerical_columns_reg = reg_config["numerical_columns"],
+                                         ordinal_columns_reg = reg_config["ordinal_columns"]
+                                        )
+    df_reg = reg_handler.handle(df)
+
+    cla_handler = ClassificationPreprocessor(
+                                    columns_to_keep=cla_config["columns_to_keep"],
+                                    nominal_columns_cla = cla_config["nominal_columns"],
+                                    numerical_columns_cla = cla_config ["numerical_columns"]
+                                    )
+    df_cla = cla_handler.handle(df)
 
 if __name__ == "__main__":
     data_pipeline()
