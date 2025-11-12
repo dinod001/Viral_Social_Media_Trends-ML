@@ -35,7 +35,8 @@ def data_pipeline(
     feature_engineering_config = get_feature_engineering()
     reg_config = get_preprocessing(task="regression")
     cla_config = get_preprocessing(task="classification")
-    #splitting_config = get_splitting()
+    reg_split_config = get_splitting(task="regression")
+    cla_split_config = get_splitting(task="classification")
 
     print("\n----------01 data ingestion-----------\n")
 
@@ -59,7 +60,7 @@ def data_pipeline(
     df = outlier_handler.handle_outliers(df,selected_columns=outlier_config["selected_columns"])
     print(df.shape[0])
 
-    print("\n------------step 04: Scalling and encoding--------------\n")
+    print("\n------------step 05: Scalling and encoding--------------\n")
 
     reg_handler = RegressionPreprocessor(columns_to_drop=reg_config["columns_to_drop"],
                                          nominal_columns_reg= reg_config["nominal_columns"],
@@ -74,6 +75,35 @@ def data_pipeline(
                                     numerical_columns_cla = cla_config ["numerical_columns"]
                                     )
     df_cla = cla_handler.handle(df)
+
+    print("\n------------step 06: Splitting data -------------\n")
+
+    reg_splitter_handler = SimpleTrainTestSplitStrategy()
+    X_train_reg, X_test_reg, y_train_reg, y_test_reg = reg_splitter_handler.split_data(df_reg,target_column=reg_split_config["target_column"])
+
+    saving_path = reg_split_config["saving_path"]
+
+    X_train_reg.to_csv(f"{saving_path}/X_train_reg.csv",index=False)
+    X_test_reg.to_csv(f"{saving_path}/X_test_reg.csv",index=False)
+    y_train_reg.to_csv(f"{saving_path}/y_train_reg.csv",index=False)
+    y_test_reg.to_csv(f"{saving_path}/y_test_reg.csv",index=False)
+
+    cla_splitter_handler = SimpleTrainTestSplitStrategy(stratify=True)
+
+    X_train_cla, X_test_cla, y_train_cla, y_test_cla = cla_splitter_handler.split_data(df_cla,target_column=cla_split_config["target_column"])
+
+    saving_path = cla_split_config["saving_path"]
+
+    X_train_cla.to_csv(f"{saving_path}/X_train_cla.csv",index=False)
+    X_test_cla.to_csv(f"{saving_path}/X_test_cla.csv",index=False)
+    y_train_cla.to_csv(f"{saving_path}/y_train_cla.csv",index=False)
+    y_test_cla.to_csv(f"{saving_path}/y_test_cla.csv",index=False)
+
+    # ---------- Pipeline Complete ----------
+    print("\n🏁 ==============================================")
+    print("     🎉 DATA PIPELINE EXECUTED SUCCESSFULLY 🎉")
+    print("==================================================\n")
+
 
 if __name__ == "__main__":
     data_pipeline()

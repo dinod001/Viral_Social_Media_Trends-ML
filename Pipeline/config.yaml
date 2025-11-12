@@ -108,9 +108,11 @@ splitting:
     test_size: 0.2
     random_state: 42
     stratify: false
+    saving_path: "artifacts/data/regression/"
   classification:
     target_column: "Engagement_Level"
     test_size: 0.2
     random_state: 42
     stratify: true
+    saving_path: "artifacts/data/classification/"
 
