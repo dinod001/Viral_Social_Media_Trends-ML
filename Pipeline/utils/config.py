@@ -67,3 +67,38 @@ def get_splitting(task: str) -> Dict[str, Any]:
 	config = load_config()
 	return (config.get('splitting', {}) or {}).get(task, {}) or {}
 
+
+def get_model_building(task: str = None) -> Dict[str, Any]:
+	"""
+	Get model building section. If task is provided ('regression' or 'classification'),
+	returns only that task's config, otherwise returns entire model_building section.
+	"""
+	config = load_config()
+	model_building = config.get('model_building', {}) or {}
+	if task:
+		return model_building.get(task, {}) or {}
+	return model_building
+
+
+def get_model_training(task: str = None) -> Dict[str, Any]:
+	"""
+	Get model training section. If task is provided ('regression' or 'classification'),
+	returns only that task's config, otherwise returns entire model_training section.
+	"""
+	config = load_config()
+	model_training = config.get('model_training', {}) or {}
+	if task:
+		return model_training.get(task, {}) or {}
+	return model_training
+
+
+def get_model_evaluation(task: str = None) -> Dict[str, Any]:
+	"""
+	Get model evaluation section. If task is provided ('regression' or 'classification'),
+	returns only that task's config, otherwise returns entire model_evaluation section.
+	"""
+	config = load_config()
+	model_evaluation = config.get('model_evaluation', {}) or {}
+	if task:
+		return model_evaluation.get(task, {}) or {}
+	return model_evaluation
