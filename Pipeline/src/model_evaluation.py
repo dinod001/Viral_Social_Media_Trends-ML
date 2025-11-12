@@ -23,9 +23,9 @@ class ModelEvaluator:
 
         cm = confusion_matrix(y_test, y_pred)
         accuracy = accuracy_score(y_test, y_pred)
-        precision = precision_score(y_test, y_pred, zero_division=0)
-        recall = recall_score(y_test, y_pred, zero_division=0)
-        f1 = f1_score(y_test, y_pred, zero_division=0)
+        precision = precision_score(y_test, y_pred, zero_division=0,average='weighted')
+        recall = recall_score(y_test, y_pred, zero_division=0,average='weighted')
+        f1 = f1_score(y_test, y_pred, zero_division=0,average='weighted')
 
         self.evaluation_results = {
             "confusion_matrix": cm,
