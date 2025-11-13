@@ -73,13 +73,15 @@ class NewFeatureEngineer(FeatureEngineer):
 
         # Engagement rates
         df['Like_Rate'] = df['Likes'] / df['Views']
-        df['Share_Rate'] = df['Shares'] / df['Views']
+        if "Shares" in df.columns:
+            df['Share_Rate'] = df['Shares'] / df['Views']
+            df['Engagement_Rate'] = (df['Likes'] + df['Shares'] + df['Comments']) / df['Views']
         df['Comment_Rate'] = df['Comments'] / df['Views']
-        df['Engagement_Rate'] = (df['Likes'] + df['Shares'] + df['Comments']) / df['Views']
 
         # Interaction ratios
         df['Like_to_Comment_Ratio'] = df['Likes'] / (df['Comments'] + 1)
-        df['Share_to_Like_Ratio'] = df['Shares'] / (df['Likes'] + 1)
+        if "Shares" in df.columns:
+            df['Share_to_Like_Ratio'] = df['Shares'] / (df['Likes'] + 1)
 
         # Platform-normalized metrics using saved means
         df['Views_Norm'] = df.apply(
