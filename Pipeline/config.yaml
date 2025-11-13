@@ -52,8 +52,9 @@ preprocessing:
     # Drop per EDA 05_encoding_and_scalling.ipynb
     columns_to_drop:
       - Share_Rate
-      - Share_to_Like_Ratio
+      - Total_Engagement
       - Engagement_Rate
+      - Engagement_Level
     nominal_columns:
       - Platform
       - Hashtag
@@ -66,10 +67,11 @@ preprocessing:
       - Comments
       - Like_Rate
       - Comment_Rate
-      - Like_to_Comment_Ratio
+      - Total_Engagement_wo_Shares
+      - Engagement_Rate_wo_Shares
       - Views_Norm
     ordinal_columns: 
-      - Engagement_Level
+      
 
   classification:
     # ClassificationPreprocessor.__init__(...)
@@ -93,6 +95,7 @@ preprocessing:
     numerical_columns:
       - Views
       - Views_Norm
+    target_column: Engagement_Level
 
 splitting:
   # SimpleTrainTestSplitStrategy.__init__(test_size, random_state, stratify)

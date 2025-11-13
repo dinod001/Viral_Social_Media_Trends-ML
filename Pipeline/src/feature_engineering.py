@@ -67,21 +67,16 @@ class NewFeatureEngineer(FeatureEngineer):
         logging.info("Starting feature engineering...")
         df = df.copy()
 
-        # Replace 0 with NaN to avoid division by zero
-        df['Views'] = df['Views'].replace(0, pd.NA)
-        df['Likes'] = df['Likes'].replace(0, pd.NA)
-
         # Engagement rates
-        df['Like_Rate'] = df['Likes'] / df['Views']
-        if "Shares" in df.columns:
-            df['Share_Rate'] = df['Shares'] / df['Views']
-            df['Engagement_Rate'] = (df['Likes'] + df['Shares'] + df['Comments']) / df['Views']
-        df['Comment_Rate'] = df['Comments'] / df['Views']
+        df['Like_Rate'] = (df['Likes'] / df['Views'])
+        df['Share_Rate'] = (df['Shares'] / df['Views'])
+        df['Comment_Rate'] = (df['Comments'] / df['Views'])
+        
+        df['Total_Engagement'] = df[['Likes', 'Shares', 'Comments']].sum(axis=1)
+        df['Engagement_Rate'] = (df['Total_Engagement'] / df['Views'])
 
-        # Interaction ratios
-        df['Like_to_Comment_Ratio'] = df['Likes'] / (df['Comments'] + 1)
-        if "Shares" in df.columns:
-            df['Share_to_Like_Ratio'] = df['Shares'] / (df['Likes'] + 1)
+        df['Total_Engagement_wo_Shares'] = df['Likes'] + df['Comments']
+        df['Engagement_Rate_wo_Shares'] = (df['Likes'] + df['Comments']) / df['Views']
 
         # Platform-normalized metrics using saved means
         df['Views_Norm'] = df.apply(

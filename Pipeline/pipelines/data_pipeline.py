@@ -74,7 +74,8 @@ def data_pipeline(
     cla_handler = ClassificationPreprocessor(
                                     columns_to_keep=cla_config["columns_to_keep"],
                                     nominal_columns_cla = cla_config["nominal_columns"],
-                                    numerical_columns_cla = cla_config ["numerical_columns"]
+                                    numerical_columns_cla = cla_config ["numerical_columns"],
+                                    target_column = cla_config["target_column"]
                                     )
     df_cla = cla_handler.handle(df)
 

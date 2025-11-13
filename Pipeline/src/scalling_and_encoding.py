@@ -85,12 +85,14 @@ class ClassificationPreprocessor(Preprocessor):
     def __init__(self, columns_to_keep=None,
                  nominal_columns_cla=None,
                  numerical_columns_cla=None,
+                 target_column=None,
                  save_path='data/processed/',
                  artifacts_path='artifacts/preprocessor/',
                  encoder_path='artifacts/encoder/'):
         self.columns_to_keep = columns_to_keep or []
         self.nominal_columns_cla = nominal_columns_cla or []
         self.numerical_columns_cla = numerical_columns_cla or []
+        self.target_column = target_column
         self.save_path = save_path
         self.artifacts_path = artifacts_path
         self.encoder_path = encoder_path
@@ -125,9 +127,9 @@ class ClassificationPreprocessor(Preprocessor):
         df_transformed = pd.DataFrame(transformed, columns=all_features, index=df_cla.index)
 
         # Encode target if present
-        if 'Engagement_Level' in df_cla.columns:
+        if self.target_column in df_cla.columns:
             target_encoder = OrdinalEncoder()
-            df_transformed['Engagement_Level'] = target_encoder.fit_transform(df_cla[['Engagement_Level']])
+            df_transformed[self.target_column] = target_encoder.fit_transform(df_cla[[self.target_column]])
             joblib.dump(target_encoder, os.path.join(self.encoder_path, 'classification_target_encoder.joblib'))
 
         # Save results
