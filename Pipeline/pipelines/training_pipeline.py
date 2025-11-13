@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
     logger.info("🚀 Starting model training process...")
     training_pipeline(
-        model_name="regression",
+        model_name="classification",
         model_params=reg_training_config["param_grids"]["XGBoost"],
-        cv=kf
+        cv=skf
     )

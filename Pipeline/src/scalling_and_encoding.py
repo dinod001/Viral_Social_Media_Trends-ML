@@ -42,8 +42,6 @@ class RegressionPreprocessor(Preprocessor):
 
     def handle(self, df: pd.DataFrame):
         logging.info("Starting regression preprocessing...")
-
-        # Drop unwanted columns
         df_reg = df.drop(columns=self.columns_to_drop, errors='ignore')
 
         numerical_cols = self.numerical_columns_reg
@@ -51,17 +49,51 @@ class RegressionPreprocessor(Preprocessor):
         ordinal_cols = self.ordinal_columns_reg
 
         transformers = []
+
+        # ---------------------------
+        # 1️⃣ Scale numerical columns
+        # ---------------------------
         if numerical_cols:
-            transformers.append(('num', Pipeline([('scaler', MinMaxScaler())]), numerical_cols))
+            scaler = MinMaxScaler()
+            transformers.append(('num', Pipeline([('scaler', scaler)]), numerical_cols))
+
+            # Save only the Shares scaler
+            if 'Shares' in numerical_cols:
+                shares_scaler = MinMaxScaler()
+                shares_scaler.fit(df_reg[['Shares']].values)  # fit only on Shares
+                joblib.dump(
+                    shares_scaler,
+                    os.path.join(self.artifacts_path, 'shares_minmax_scaler.joblib')
+                )
+                logging.info("Saved Shares MinMaxScaler separately.")
+
+        # ---------------------------
+        # 2️⃣ Encode nominal columns
+        # ---------------------------
         if nominal_cols:
-           transformers.append(('nom', Pipeline([('encoder', OneHotEncoder(sparse_output=False, drop='first'))]), nominal_cols))
+            transformers.append(
+                ('nom', Pipeline([
+                    ('encoder', OneHotEncoder(sparse_output=False, drop='first', handle_unknown='ignore'))
+                ]), nominal_cols)
+            )
+
+        # ---------------------------
+        # 3️⃣ Encode ordinal columns
+        # ---------------------------
         if ordinal_cols:
-            transformers.append(('ord', Pipeline([('encoder', OrdinalEncoder())]), ordinal_cols))
+            transformers.append(
+                ('ord', Pipeline([('encoder', OrdinalEncoder())]), ordinal_cols)
+            )
 
+        # ---------------------------
+        # 4️⃣ Apply ColumnTransformer
+        # ---------------------------
         preprocessor = ColumnTransformer(transformers, remainder='drop')
-
         transformed = preprocessor.fit_transform(df_reg)
 
+        # ---------------------------
+        # 5️⃣ Reconstruct DataFrame
+        # ---------------------------
         all_features = numerical_cols.copy()
         if nominal_cols:
             nom_names = preprocessor.named_transformers_['nom'].named_steps['encoder'].get_feature_names_out(nominal_cols)
@@ -70,9 +102,12 @@ class RegressionPreprocessor(Preprocessor):
 
         df_transformed = pd.DataFrame(transformed, columns=all_features, index=df_reg.index)
 
-        # Save results
+        # ---------------------------
+        # 6️⃣ Save processed data & preprocessor
+        # ---------------------------
         csv_path = os.path.join(self.save_path, 'regression_scaled_encoded.csv')
         df_transformed.to_csv(csv_path, index=False)
+
         joblib.dump(preprocessor, os.path.join(self.artifacts_path, 'regression_preprocessor.joblib'))
 
         logging.info(f"Regression preprocessing done. Saved CSV: {csv_path}, shape: {df_transformed.shape}")
@@ -113,7 +148,7 @@ class ClassificationPreprocessor(Preprocessor):
         if numerical_cols:
             transformers.append(('num', Pipeline([('scaler', MinMaxScaler())]), numerical_cols))
         if nominal_cols:
-           transformers.append(('nom', Pipeline([('encoder', OneHotEncoder(sparse_output=False, drop='first'))]), nominal_cols))
+           transformers.append(('nom', Pipeline([('encoder', OneHotEncoder(sparse_output=False, drop='first', handle_unknown='ignore'))]), nominal_cols))
 
         preprocessor = ColumnTransformer(transformers, remainder='drop')
 

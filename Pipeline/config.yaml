@@ -77,7 +77,7 @@ preprocessing:
     # ClassificationPreprocessor.__init__(...)
     save_path: "Piepeline/data/processed"
     artifacts_path: "Piepeline/artifacts/encode"
-    encoder_path: "Piepeline/artifacts/encode"
+    encoder_path: "artifacts/encoder"
     # From EDA/data/processed/df_cla.csv header
     columns_to_keep:
       - Platform

@@ -55,7 +55,7 @@ class NewFeatureEngineer(FeatureEngineer):
 
     def handle(self, df: pd.DataFrame) -> pd.DataFrame:
         """Add engagement, interaction, and normalized view features."""
-        required_cols = ['Likes', 'Shares', 'Comments', 'Views', 'Platform']
+        required_cols = ['Likes','Comments', 'Views', 'Platform']
         missing_cols = [col for col in required_cols if col not in df.columns]
         if missing_cols:
             logging.error(f"Missing required columns: {missing_cols}")
