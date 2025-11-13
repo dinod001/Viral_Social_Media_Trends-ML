@@ -14,7 +14,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
-from handling_outliers import IQROutlierDetection
+from handling_outliers import CustomOutlierDetection
 from data_ingestion import DataIngestorCSV
 from handling_missing_values import DropMissingValuesStrategy
 from feature_engineering import NewFeatureEngineer
@@ -48,17 +48,19 @@ def data_pipeline(
     drop_handler = DropMissingValuesStrategy()
     df = drop_handler.handle(df)
 
-    print("\n------------step 03: Feature Engineering--------------\n")
+    print("\n------------step 03: Handling Outliers--------------\n")
+
+    outlier_handler = OutlierDetector(CustomOutlierDetection())
+    df = outlier_handler.handle_outliers(df,selected_columns=outlier_config["selected_columns"],
+                                        target_column=outlier_config["target_column"]
+                                        )
+    print(df.shape[0])
+
+    print("\n------------step 04: Feature Engineering--------------\n")
 
     feature_handler = NewFeatureEngineer(means_file=feature_engineering_config['means_file'])
     feature_handler.fit(df)
     df = feature_handler.handle(df)
-
-    print("\n------------step 04: Handling Outliers--------------\n")
-
-    outlier_handler = OutlierDetector(IQROutlierDetection())
-    df = outlier_handler.handle_outliers(df,selected_columns=outlier_config["selected_columns"])
-    print(df.shape[0])
 
     print("\n------------step 05: Scalling and encoding--------------\n")
 

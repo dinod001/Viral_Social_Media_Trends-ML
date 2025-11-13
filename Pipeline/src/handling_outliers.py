@@ -5,43 +5,38 @@ from abc import ABC, abstractmethod
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(levelname)s - %(message)s"
 )
-
 
 class OutlierDetectionStrategy(ABC):
     """Abstract base class for outlier detection strategies."""
 
     @abstractmethod
-    def detect_outliers(self, df: pd.DataFrame, columns: list) -> pd.DataFrame:
-        """Return a boolean DataFrame marking outliers (True = outlier)."""
+    def detect_outliers(self, df: pd.DataFrame, columns: list, target_column: str) -> pd.DataFrame:
+        """Return a DataFrame with outliers removed based on the implemented strategy."""
         pass
 
 
-class IQROutlierDetection(OutlierDetectionStrategy):
-    """Detects outliers using the Interquartile Range (IQR) method."""
+class CustomOutlierDetection(OutlierDetectionStrategy):
+    """Detects logical outliers based on a target reference column (e.g., Views)."""
 
-    def detect_outliers(self, df: pd.DataFrame, columns: list) -> pd.DataFrame:
-        outliers = pd.DataFrame(False, index=df.index, columns=columns)
+    def detect_outliers(self, df: pd.DataFrame, columns: list, target_column: str) -> pd.DataFrame:
+        logging.info(f"Starting outlier detection using CustomOutlierDetection strategy...")
+        initial_rows = len(df)
+        df_filtered = df.copy()
+        df_filtered = df_filtered.reset_index(drop=True)
 
         for col in columns:
-            # Ensure numeric dtype
-            df[col] = pd.to_numeric(df[col], errors='coerce')
+            before = len(df_filtered)
+            df_filtered = df_filtered[df_filtered[col] <= df_filtered[target_column]]
+            removed = before - len(df_filtered)
+            logging.info(f"Filtered {removed} rows where {col} > {target_column}")
 
-            Q1 = df[col].quantile(0.25)
-            Q3 = df[col].quantile(0.75)
-            IQR = Q3 - Q1
+        total_removed = initial_rows - len(df_filtered)
+        logging.info(f"Outlier removal complete. Total rows removed: {total_removed}")
+        logging.info(f"Data shape before: {initial_rows}, after: {len(df_filtered)}")
 
-            lower_bound = Q1 - 2 * IQR
-            upper_bound = Q3 + 2 * IQR
-
-            outliers[col] = (df[col] < lower_bound) | (df[col] > upper_bound)
-
-            logging.info(f"Column '{col}': IQR={IQR:.2f}, "
-                         f"Lower={lower_bound:.2f}, Upper={upper_bound:.2f}, "
-                         f"Outliers={outliers[col].sum()}")
-
-        return outliers
+        return df_filtered
 
 
 class OutlierDetector:
@@ -50,15 +45,13 @@ class OutlierDetector:
     def __init__(self, strategy: OutlierDetectionStrategy):
         self.strategy = strategy
 
-    def detect_outliers(self, df: pd.DataFrame, selected_columns: list) -> pd.DataFrame:
-        return self.strategy.detect_outliers(df, selected_columns)
+    def detect_outliers(self, df: pd.DataFrame, selected_columns: list, target_column: str) -> pd.DataFrame:
+        logging.info("Detecting outliers...")
+        return self.strategy.detect_outliers(df, selected_columns, target_column)
 
-    def handle_outliers(self, df: pd.DataFrame, selected_columns: list) -> pd.DataFrame:
-        """Remove rows that contain outliers in two or more of the selected columns."""
-        outliers = self.detect_outliers(df, selected_columns)
-        outlier_counts = outliers.sum(axis=1)
-        rows_to_remove = outlier_counts >= 2
-        n_removed = rows_to_remove.sum()
-
-        logging.info(f"{n_removed} rows removed due to multiple outliers.")
-        return df[~rows_to_remove].reset_index(drop=True)
+    def handle_outliers(self, df: pd.DataFrame, selected_columns: list, target_column: str) -> pd.DataFrame:
+        """Apply the outlier detection and return a cleaned DataFrame."""
+        logging.info("Handling outliers with selected strategy...")
+        df_cleaned = self.detect_outliers(df, selected_columns, target_column)
+        logging.info("Outlier handling completed successfully.")
+        return df_cleaned

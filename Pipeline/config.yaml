@@ -16,17 +16,11 @@ outliers:
   detection_method: "IQR"
   # Columns from EDA/03_handling_outliers.ipynb - all numerical columns used for outlier detection
   selected_columns:
-    - Views
     - Likes
     - Shares
     - Comments
-    - Like_Rate
-    - Share_Rate
-    - Comment_Rate
-    - Engagement_Rate
-    - Like_to_Comment_Ratio
-    - Share_to_Like_Ratio
-    - Views_Norm
+
+  target_column: Views
   # Remove a row if it is an outlier in >= this many selected columns
   remove_if_outlier_count_ge: 2
 
