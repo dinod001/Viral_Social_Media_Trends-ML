@@ -1,0 +1,10 @@
+artifact_location: file:///E:/social media analyzer/Viral_Social_Media_Trends-Finder/Pipeline/mlruns/715367310647199178/models/m-89a02a7af7704509a64cb5ddd61b131e/artifacts
+creation_timestamp: 1763129041980
+experiment_id: '715367310647199178'
+last_updated_timestamp: 1763129049992
+model_id: m-89a02a7af7704509a64cb5ddd61b131e
+model_type: null
+name: model
+source_run_id: 13788ef588d944b0a6a631b000878117
+status: 2
+status_message: null

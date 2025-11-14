@@ -1,0 +1,14 @@
+artifact_path: file:///E:/social media analyzer/Viral_Social_Media_Trends-Finder/Pipeline/mlruns/715367310647199178/models/m-1a285bf7a8214c1ca679b37c8ccc78ee/artifacts
+flavors:
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.2
+mlflow_version: 3.6.0
+model_id: m-1a285bf7a8214c1ca679b37c8ccc78ee
+model_size_bytes: 152068
+model_uuid: m-1a285bf7a8214c1ca679b37c8ccc78ee
+prompts: null
+run_id: 13788ef588d944b0a6a631b000878117
+utc_time_created: '2025-11-14 14:04:10.334465'

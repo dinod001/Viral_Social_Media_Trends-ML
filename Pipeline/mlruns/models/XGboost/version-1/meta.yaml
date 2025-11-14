@@ -1,0 +1,15 @@
+creation_timestamp: 1763128671683
+current_stage: None
+deployment_job_state: null
+description: null
+last_updated_timestamp: 1763128671683
+model_id: m-e289acfe4e84450fbde4f7697f576a0d
+name: XGboost
+run_id: 363a155f03b24bbe8fea34b656ee5584
+run_link: null
+source: models:/m-e289acfe4e84450fbde4f7697f576a0d
+status: READY
+status_message: null
+storage_location: file:///E:/social media analyzer/Viral_Social_Media_Trends-Finder/Pipeline/mlruns/715367310647199178/models/m-e289acfe4e84450fbde4f7697f576a0d/artifacts
+user_id: null
+version: 1

@@ -1,0 +1,22 @@
+artifact_path: file:///E:/social media analyzer/Viral_Social_Media_Trends-Finder/Pipeline/mlruns/715367310647199178/models/m-e289acfe4e84450fbde4f7697f576a0d/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.11.0
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.2
+mlflow_version: 3.6.0
+model_id: m-e289acfe4e84450fbde4f7697f576a0d
+model_size_bytes: 1549286
+model_uuid: m-e289acfe4e84450fbde4f7697f576a0d
+prompts: null
+run_id: 363a155f03b24bbe8fea34b656ee5584
+utc_time_created: '2025-11-14 13:57:43.116971'

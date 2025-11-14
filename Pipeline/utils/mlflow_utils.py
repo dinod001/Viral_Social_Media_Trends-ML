@@ -88,27 +88,28 @@ class MLflowTracker:
             print(f"MLflow logging failed: {e}")
 
     
-    def log_training_metrics(self, model, training_metrics: Dict[str, Any], model_params: Dict[str, Any]):
-        """Log training metrics, parameters, and model artifacts"""
+    def log_training_metrics(self, model, training_metrics=None, model_params=None,model_name=None):
         try:
-            # Log model parameters
-            mlflow.log_params(model_params)
+            # Log model parameters if provided
+            if model_params:
+                mlflow.log_params(model_params)
             
-            # Log training metrics
-            mlflow.log_metrics(training_metrics)
+            # Log training metrics if provided
+            if training_metrics:
+                mlflow.log_metrics(training_metrics)
             
-            # Log the model
+            # Always log the model
             artifact_path = self.config.get('artifact_path', 'model')
             mlflow.sklearn.log_model(
                 sk_model=model,
                 artifact_path=artifact_path,
-                registered_model_name=self.config.get('model_registry_name', 'churn_prediction_model')
+                registered_model_name=model_name
             )
-            
-            logger.info("Logged training metrics and model to MLflow")
-            
+            logger.info("Model logged successfully.")
+        
         except Exception as e:
             logger.error(f"Error logging training metrics: {e}")
+
     
     def log_evaluation_metrics(self, evaluation_metrics: Dict[str, Any], confusion_matrix_path: Optional[str] = None):
         """Log evaluation metrics and artifacts"""

@@ -1,0 +1,14 @@
+artifact_uri: file:///E:/social media analyzer/Viral_Social_Media_Trends-Finder/Pipeline/mlruns/715367310647199178/ffe131dbe7074fd38b08f0faca917d31/artifacts
+end_time: 1763128535748
+entry_point_name: ''
+experiment_id: '715367310647199178'
+lifecycle_stage: active
+run_id: ffe131dbe7074fd38b08f0faca917d31
+run_name: regression training | 2025-11-14 19:22:20
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1763128340383
+status: 3
+tags: []
+user_id: dinod

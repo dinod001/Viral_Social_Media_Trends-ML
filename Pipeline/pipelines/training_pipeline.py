@@ -118,7 +118,7 @@ def training_pipeline(
         print(evaluation_results)
 
         metrics_to_log = {k: float(v) for k, v in evaluation_results.items() if k != "confusion_matrix"}
-        mlflow_tracker.log_training_metrics(model, metrics_to_log, model_params)
+        mlflow_tracker.log_training_metrics(model, metrics_to_log, model_params,model_name="XGBRegressor")
         mlflow_tracker.end_run()
 
     # ---------------- Classification ---------------- #
@@ -154,7 +154,7 @@ def training_pipeline(
         print(evaluation_results)
 
         metrics_to_log = {k: float(v) for k, v in evaluation_results_cp.items() if k != "confusion_matrix"}
-        mlflow_tracker.log_training_metrics(model, metrics_to_log, model_params)
+        mlflow_tracker.log_training_metrics(model, metrics_to_log, model_params,model_name="XGboost")
         mlflow_tracker.end_run()
     
     elif model_name == 'clustering':
@@ -184,8 +184,8 @@ def training_pipeline(
         trainer.save_model(kmean_model, kmean_model_path)
         trainer.save_model(dbscan_model, dbscan_model_path)
 
-        mlflow_tracker.log_training_metrics(kmean_model, None, None)
-        mlflow_tracker.log_training_metrics(dbscan_model, None, None)
+        mlflow_tracker.log_training_metrics(kmean_model, None, None,model_name="Kmean")
+        mlflow_tracker.log_training_metrics(dbscan_model, None, None,model_name="Dbscan")
 
          #mlflow
     logger.info(f"✅ Training pipeline completed successfully for {model_name} model.")
