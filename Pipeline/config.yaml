@@ -220,6 +220,12 @@ model_training:
         subsample: [0.8, 1]
     # Model save directory
     model_dir: "artifacts/models/regression/reg_socialMedia_analyzer.joblib"
+  
+  kmeans:
+    model_dir: "artifacts/models/clustering/kmean_socialMedia_analyzer.joblib"
+  
+  dbscan:
+    model_dir: "artifacts/models/clustering/dbscan_socialMedia_analyzer.joblib"
 
 model_evaluation:
   # ModelEvaluator settings

@@ -12,6 +12,7 @@ imblearn
 # Model Libraries
 xgboost>=1.6.0
 lightgbm>=3.3.0
+umap-learn>=0.5.3
 
 # Visualization Libraries
 matplotlib>=3.5.0

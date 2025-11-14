@@ -1,8 +1,11 @@
 import joblib, os
 import logging
+import pandas as pd
 from xgboost import XGBClassifier, XGBRegressor
 from abc import ABC, abstractmethod
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.metrics import silhouette_score
+from sklearn.cluster import KMeans,DBSCAN
 
 # Configure logging
 logging.basicConfig(
@@ -113,3 +116,57 @@ class XGBRegressorModelBuilder(BaseModelBuilder):
         self.model = XGBRegressor(**self.model_params)
         logger.info(f"XGBRegressor built with params: {self.model_params}")
         return self.model
+
+class KmeanClustering(BaseModelBuilder):
+    def __init__(self, df:pd.DataFrame):
+        self.df = df
+        self.model = self.build_model()
+    
+    def build_model(self):
+        logger.info("Building Kmeans model using silhouette score")
+        K = range(2,11)
+        silhouette_scores = {}
+        for k in K:
+            labels = KMeans(n_clusters=k, random_state=42, n_init=10).fit_predict(self.df)
+            score = silhouette_score(self.df, labels)
+            silhouette_scores[k] = score
+        
+        best_k = max(silhouette_scores,key=silhouette_scores.get)
+        self.model = KMeans(n_clusters=best_k, random_state=42, n_init=10)
+        logger.info(" ✅  Building Kmeans model Successfully ")
+        return self.model
+
+class DBSCANClustering(BaseModelBuilder):
+    def __init__(self, df: pd.DataFrame, eps_values=None, min_samples=5):
+        self.df = df
+        self.min_samples = min_samples
+        self.eps_values = eps_values or [0.2, 0.4, 0.6, 0.8, 1.0, 1.5, 2.0]
+        self.model = self.build_model()
+
+    def build_model(self):
+        logger.info("Building DBSCAN model using silhouette score to select best eps...")
+
+        best_eps = None
+        best_score = -1
+
+        for eps in self.eps_values:
+            model = DBSCAN(eps=eps, min_samples=self.min_samples)
+            labels = model.fit_predict(self.df)
+
+            # DBSCAN can produce noise (-1), silhouette fails if 1 cluster
+            if len(set(labels)) <= 1:
+                continue
+
+            score = silhouette_score(self.df, labels)
+            logger.info(f"eps={eps} → Silhouette Score: {score:.4f}")
+
+            if score > best_score:
+                best_score = score
+                best_eps = eps
+
+        logger.info(f"Best eps selected: {best_eps} (Silhouette = {best_score:.4f})")
+        self.model = DBSCAN(eps=best_eps, min_samples=self.min_samples)
+        self.model.fit(self.df)
+        logger.info(" ✅  Building Dbscan model Successfully ")
+        return self.model
+
