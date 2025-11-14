@@ -5,7 +5,7 @@ import logging
 from abc import ABC, abstractmethod
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import MinMaxScaler, OneHotEncoder, OrdinalEncoder
+from sklearn.preprocessing import MinMaxScaler,StandardScaler, OneHotEncoder, OrdinalEncoder
 import joblib
 
 logging.basicConfig(
@@ -174,3 +174,71 @@ class ClassificationPreprocessor(Preprocessor):
 
         logging.info(f"Classification preprocessing done. Saved CSV: {csv_path}, shape: {df_transformed.shape}")
         return df_transformed
+
+class ClusteringPreprocessor(Preprocessor):
+    """Preprocess dataset for clustering."""
+
+    def __init__(self, columns_to_keep=None,
+                 nominal_columns_cla=None,
+                 numerical_columns_cla=None,
+                 artifacts_path='artifacts/preprocessor/',
+                 save_path='data/processed/'
+                ):
+        
+        self.columns_to_keep = columns_to_keep or []
+        self.nominal_columns_cla = nominal_columns_cla or []
+        self.numerical_columns_cla = numerical_columns_cla or []
+        self.artifacts_path = artifacts_path
+        self.save_path = save_path
+
+    def handle(self, df: pd.DataFrame):
+        logging.info("Starting clustering preprocessing...")
+
+        # Keep only selected columns
+        df = df[self.columns_to_keep]
+
+        numerical_columns = self.numerical_columns_cla
+        nominal_columns = self.nominal_columns_cla
+        ordinal_columns = []
+
+        numerical_transformer = Pipeline(
+            steps=[('scaler', StandardScaler())]   # <-- Standardization (Z-score)
+        )
+
+        nominal_transformer = Pipeline(
+            steps=[('encoder', OneHotEncoder(sparse_output=False))]
+        )
+
+        ordinal_transformer = Pipeline(
+            steps=[('encoder', OrdinalEncoder())]
+        )
+
+        # === Combine transformations ===
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('num', numerical_transformer, numerical_columns),
+                ('nom', nominal_transformer, nominal_columns),
+                ('ord', ordinal_transformer, ordinal_columns)
+            ],
+            remainder='drop'
+        )
+
+        # === Apply transformations ===
+        transformed_array = preprocessor.fit_transform(df)
+
+        # Get encoded column names for nominal features
+        nominal_feature_names = preprocessor.named_transformers_['nom'] \
+            .named_steps['encoder'].get_feature_names_out(nominal_columns)
+
+        # Combine all feature names
+        all_feature_names = numerical_columns + list(nominal_feature_names) + ordinal_columns
+
+        # Create new DataFrame
+        df_transformed = pd.DataFrame(transformed_array, columns=all_feature_names)
+        df_transformed.index = df.index  # Optional, keep same index
+
+        #saving
+        csv_path = os.path.join(self.save_path, 'clustering_scaled_encoded.csv')
+        df_transformed.to_csv(csv_path, index=False)
+        joblib.dump(preprocessor, os.path.join(self.artifacts_path, 'clustering_preprocessor.joblib'))
+        logging.info(f"Clustering preprocessing done. Saved CSV: {csv_path}, shape: {df_transformed.shape}")

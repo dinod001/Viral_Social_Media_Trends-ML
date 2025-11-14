@@ -96,6 +96,28 @@ preprocessing:
       - Views
       - Views_Norm
     target_column: Engagement_Level
+  
+  clustering:
+    # ClassificationPreprocessor.__init__(...)
+    save_path: "data/processed"
+    artifacts_path: "artifacts/encode"
+    encoder_path: "artifacts/encoder"
+    # From EDA/data/processed/df_cla.csv header
+    columns_to_keep:
+      - Platform
+      - Hashtag
+      - Content_Type
+      - Region
+      - Views
+      - Views_Norm
+    nominal_columns:
+      - Platform
+      - Hashtag
+      - Content_Type
+      - Region
+    numerical_columns:
+      - Views
+      - Views_Norm
 
 splitting:
   # SimpleTrainTestSplitStrategy.__init__(test_size, random_state, stratify)

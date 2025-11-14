@@ -19,7 +19,7 @@ from data_ingestion import DataIngestorCSV
 from handling_missing_values import DropMissingValuesStrategy
 from feature_engineering import NewFeatureEngineer
 from handling_outliers import OutlierDetector
-from scalling_and_encoding import RegressionPreprocessor,ClassificationPreprocessor
+from scalling_and_encoding import RegressionPreprocessor,ClassificationPreprocessor,ClusteringPreprocessor
 from data_splitter import SimpleTrainTestSplitStrategy
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'utils'))
 from config import get_data,get_ingestion,get_missing_values,get_outliers,get_feature_engineering,get_preprocessing,get_splitting
@@ -35,6 +35,7 @@ def data_pipeline(
     feature_engineering_config = get_feature_engineering()
     reg_config = get_preprocessing(task="regression")
     cla_config = get_preprocessing(task="classification")
+    clu_config = get_preprocessing(task="clustering")
     reg_split_config = get_splitting(task="regression")
     cla_split_config = get_splitting(task="classification")
 
@@ -78,6 +79,13 @@ def data_pipeline(
                                     target_column = cla_config["target_column"]
                                     )
     df_cla = cla_handler.handle(df)
+
+    clu_handler = ClusteringPreprocessor(
+                                    columns_to_keep=clu_config["columns_to_keep"],
+                                    nominal_columns_cla = clu_config["nominal_columns"],
+                                    numerical_columns_cla = clu_config ["numerical_columns"],
+                                    )
+    clu_handler.handle(df)
 
     print("\n------------step 06: Splitting data -------------\n")
 
