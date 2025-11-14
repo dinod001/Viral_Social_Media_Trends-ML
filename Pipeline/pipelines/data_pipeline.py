@@ -23,6 +23,7 @@ from scalling_and_encoding import RegressionPreprocessor,ClassificationPreproces
 from data_splitter import SimpleTrainTestSplitStrategy
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'utils'))
 from config import get_data,get_ingestion,get_missing_values,get_outliers,get_feature_engineering,get_preprocessing,get_splitting
+from mlflow_utils import MLflowTracker, setup_mlflow_autolog, create_mlflow_run_tags
 
 def data_pipeline(
     data_path: str = 'data/raw/Viral_Social_Media_Trends.csv',
@@ -38,6 +39,9 @@ def data_pipeline(
     clu_config = get_preprocessing(task="clustering")
     reg_split_config = get_splitting(task="regression")
     cla_split_config = get_splitting(task="classification")
+
+    #mlflow intergrating
+    mlflow_tracker = MLflowTracker()
 
     print("\n----------01 data ingestion-----------\n")
 
@@ -99,6 +103,24 @@ def data_pipeline(
     y_train_reg.to_csv(f"{saving_path}/y_train_reg.csv",index=False)
     y_test_reg.to_csv(f"{saving_path}/y_test_reg.csv",index=False)
 
+    ########## Mlflow ##################
+    regression_tags = create_mlflow_run_tags(
+        'data_pipeline', 
+        {'data_paths': data_path, 'model': 'regression'}
+    )
+    mlflow_tracker.start_run(run_name='data_pipeline_regression', tags=regression_tags)
+
+    mlflow_tracker.log_data_pipeline_metrics({
+                        'model': "Regression",
+                        'total_rows': len(X_train_reg) + len(X_test_reg),
+                        'train_rows': len(X_train_reg),
+                        'test_rows': len(X_test_reg),
+                        'num_features': X_train_reg.shape[1],
+                        'missing_values': X_train_reg.isna().sum().sum(),
+                        'outliers_removed': 270 
+                    })
+    mlflow_tracker.end_run()
+
     cla_splitter_handler = SimpleTrainTestSplitStrategy(stratify=True)
 
     X_train_cla, X_test_cla, y_train_cla, y_test_cla = cla_splitter_handler.split_data(df_cla,target_column=cla_split_config["target_column"])
@@ -109,6 +131,25 @@ def data_pipeline(
     X_test_cla.to_csv(f"{saving_path}/X_test_cla.csv",index=False)
     y_train_cla.to_csv(f"{saving_path}/y_train_cla.csv",index=False)
     y_test_cla.to_csv(f"{saving_path}/y_test_cla.csv",index=False)
+
+     ########## Mlflow ##################
+     
+    classification_tags = create_mlflow_run_tags(
+        'data_pipeline', 
+        {'data_paths': data_path, 'model': 'classification'}
+    )
+    mlflow_tracker.start_run(run_name='data_pipeline_classification', tags=classification_tags)
+
+    mlflow_tracker.log_data_pipeline_metrics({
+                        'model': "classification",
+                        'total_rows': len(X_train_cla) + len(X_test_cla),
+                        'train_rows': len(X_train_cla),
+                        'test_rows': len(X_test_cla),
+                        'num_features': X_train_cla.shape[1],
+                        'missing_values': X_train_cla.isna().sum().sum(),
+                        'outliers_removed': 270 
+                    })
+    mlflow_tracker.end_run()
 
     # ---------- Pipeline Complete ----------
     print("\n🏁 ==============================================")

@@ -1,0 +1,14 @@
+artifact_uri: file:///E:/social media analyzer/Viral_Social_Media_Trends-Finder/Pipeline/mlruns/580375405658595947/6809047fbbe74a4a93451364b844c087/artifacts
+end_time: 1763113326500
+entry_point_name: ''
+experiment_id: '580375405658595947'
+lifecycle_stage: active
+run_id: 6809047fbbe74a4a93451364b844c087
+run_name: data pipeline classification | 2025-11-14 15:12:06
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1763113326351
+status: 3
+tags: []
+user_id: dinod

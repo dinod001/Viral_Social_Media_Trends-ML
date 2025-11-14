@@ -5,8 +5,10 @@ import pandas as pd
 from data_pipeline import data_pipeline
 from typing import Dict, Any, Optional
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'utils'))
 from sklearn.model_selection import KFold, StratifiedKFold
 from dimensional_reduction import DimensionalityReducer
+from mlflow_utils import MLflowTracker, setup_mlflow_autolog, create_mlflow_run_tags
 
 from model_training import ModelTrainer
 from model_evaluation import ModelEvaluator
@@ -49,6 +51,7 @@ cla_training_config = get_model_training(task="classification")
 kmean_training_config = get_model_training(task="kmeans")
 dbscan_training_config = get_model_training(task="dbscan")
 logger.info("Configuration files loaded successfully.")
+mlflow_tracker = MLflowTracker()
 
 
 def training_pipeline(
@@ -66,6 +69,23 @@ def training_pipeline(
         data_pipeline()
     else:
         logger.info("Data artifacts found. Loading preprocessed data...")
+    
+    # ---------------- Mlflow ---------------- #
+    run_tags = create_mlflow_run_tags(
+        "training_pipeline",
+        {
+            "model_type": model_name,
+            "training_strategy": "simple",
+            "cv_type": str(type(cv).__name__) if model_name != "clustering" else "none",
+            "dimensionality_reduction": reduction_type if model_name == "clustering" else "none",
+        }
+    )
+
+    run = mlflow_tracker.start_run(
+        run_name=f"{model_name}_training",
+        tags=run_tags
+    )
+    metrics_to_log = None
 
     # ---------------- Regression ---------------- #
     if model_name == 'regression':
@@ -92,9 +112,14 @@ def training_pipeline(
 
         evaluator = ModelEvaluator(model, "XGBRegressor")
         evaluation_results = evaluator.evaluate_regression(X_test, Y_test)
+        metrics_to_log=evaluation_results
 
         logger.info(f"Regression Evaluation Results: {evaluation_results}")
         print(evaluation_results)
+
+        metrics_to_log = {k: float(v) for k, v in evaluation_results.items() if k != "confusion_matrix"}
+        mlflow_tracker.log_training_metrics(model, metrics_to_log, model_params)
+        mlflow_tracker.end_run()
 
     # ---------------- Classification ---------------- #
     elif model_name == 'classification':
@@ -127,6 +152,10 @@ def training_pipeline(
 
         logger.info(f"Classification Evaluation Results: {evaluation_results_cp}")
         print(evaluation_results)
+
+        metrics_to_log = {k: float(v) for k, v in evaluation_results_cp.items() if k != "confusion_matrix"}
+        mlflow_tracker.log_training_metrics(model, metrics_to_log, model_params)
+        mlflow_tracker.end_run()
     
     elif model_name == 'clustering':
         processed_folder = os.path.join(base_path, 'processed')
@@ -155,10 +184,10 @@ def training_pipeline(
         trainer.save_model(kmean_model, kmean_model_path)
         trainer.save_model(dbscan_model, dbscan_model_path)
 
+        mlflow_tracker.log_training_metrics(kmean_model, None, None)
+        mlflow_tracker.log_training_metrics(dbscan_model, None, None)
 
-            
-
-
+         #mlflow
     logger.info(f"✅ Training pipeline completed successfully for {model_name} model.")
 
 

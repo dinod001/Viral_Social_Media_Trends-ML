@@ -1,0 +1,15 @@
+creation_timestamp: 1763113666815
+current_stage: None
+deployment_job_state: null
+description: null
+last_updated_timestamp: 1763113666815
+model_id: m-2b03b15105bc47bea07544470b5727ba
+name: social_media_analyzer
+run_id: 12ee94b9c8ab4a4ba9041040600c9fa5
+run_link: null
+source: models:/m-2b03b15105bc47bea07544470b5727ba
+status: READY
+status_message: null
+storage_location: file:///E:/social media analyzer/Viral_Social_Media_Trends-Finder/Pipeline/mlruns/580375405658595947/models/m-2b03b15105bc47bea07544470b5727ba/artifacts
+user_id: null
+version: 2

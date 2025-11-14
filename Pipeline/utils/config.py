@@ -102,3 +102,7 @@ def get_model_evaluation(task: str = None) -> Dict[str, Any]:
 	if task:
 		return model_evaluation.get(task, {}) or {}
 	return model_evaluation
+
+def get_mlflow_config():
+    config = load_config()
+    return config.get('mlflow', {})

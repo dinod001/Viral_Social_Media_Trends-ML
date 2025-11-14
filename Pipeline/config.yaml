@@ -243,3 +243,16 @@ model_evaluation:
     # Figure save directory
     figures_dir: "artifacts/figures/regression/"
 
+
+mlflow:
+  tracking_uri: "file:./mlruns"  # Local file-based tracking
+  experiment_name: "social media analyzer"
+  model_registry_name: "social_media_analyzer"
+  artifact_path: "model"
+  run_name_prefix: "analyzer_run"
+  tags:
+    project: "social_media_analyzer"
+    team: "ml_engineering"
+    environment: "development"
+  autolog: true
+
