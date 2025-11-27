@@ -37,7 +37,7 @@ The project is organized into the following main directories:
 
 1.  **Clone the repository:**
     ```bash
-    git clone <repository_url>
+    git clone https://github.com/dinod001/Viral_Social_Media_Trends-ML.git
     cd Viral_Social_Media_Trends-Finder
     ```
 
@@ -65,7 +65,19 @@ Navigate to the `EDA` directory and run the Jupyter notebooks to understand the 
 
 ### Running the Pipeline
 Navigate to the `Pipeline` directory. You can configure the run in `config.yaml`.
-(Add specific commands here if available, e.g., `python src/main.py`)
+Navigate to the `Pipeline` directory. You can use the `Makefile` to run various stages of the pipeline.
+
+**Available Commands:**
+
+-   `make install`: Install dependencies.
+-   `make data`: Run the data pipeline.
+-   `make train`: Run the training pipeline (interactive).
+-   `make train-regression`: Run regression training (non-interactive).
+-   `make train-classification`: Run classification training (non-interactive).
+-   `make train-clustering`: Run clustering training (default: PCA).
+-   `make inference`: Run the inference pipeline.
+-   `make clean`: Clean up temporary files.
+-   `make help`: Show available commands.
 
 ### Running the Web Application
 Navigate to the `website` directory and run the Flask app:
@@ -89,4 +101,4 @@ The application will typically run on `http://localhost:5000`.
 - **MLOps Integration**: Structured pipeline for reproducible experiments (using MLflow/ZenML concepts).
 
 ## License
-[License Name]
+Copyright (c) 2025 dinod001
